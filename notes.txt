@@ -1,0 +1,53 @@
+The library was built as static and the *.so file created was copied into:
+	- /Users/francescomaio/anaconda3/lib/python3.6/site-packages/
+
+Guides:
+	- explain the meaning of the py_to_C.c file is at:
+	  http://chimera.labs.oreilly.com/books/1230000000393/ch15.html#_discussion_241
+	  paragraph: " Writing a simple C extension module"   
+	
+	- Create dynamic and static library, link them:
+	  http://www.adp-gmbh.ch/cpp/gcc/create_lib.html
+
+	- Parse numpy arrays and handle them from python to C
+	  https://docs.scipy.org/doc/numpy-1.13.0/user/c-info.how-to-extend.html
+
+	- Parsing normal arguments from python to C
+	  https://docs.python.org/3/c-api/arg.html#arg-parsing
+
+The ingredients are:
+	- A .c source code sample.c
+	- A .h header for sample.c, included by sample.c
+	- A .c py_to_C converter which includes Python.h and, for each function in sample.h
+		* Convert the argument list used by python in C types (1)
+		* Calls the actual C function contained in sample.h (2)
+		* Returns the value to python (3)
+	- A setup.py that will build the dynamic library. This process will inspect the py_to_C 
+	  and will eventually encounter the functions defined in the header. Since the header
+	  exists, the build will succed, but when we actually try to build the code the symbols 
+	  won't exist. That's why we also need:
+	- A static library where the symbols in sample.h with the relative machine code are stored. 
+
+The steps are:
+	- Create sample.h and sample.c 
+	- Create the library with:
+		* // Compile into the object with the -c flag
+		* gcc -c sample.c -o sample.o
+		* // Use the archiver to pack the library
+		* ar rcs libsample.a sample.o
+		* // Note that the library must have the prefix 'lib' but
+		*    the name used for linking is just 'sample'
+	- Test the library
+		* // compile a simple test.c file that just try the functions
+	  	* gcc test.c -L. -lsample -otest.o
+		* ./test.o
+	- If the test was successfull, check setup.py to see if the the path for the library is
+	  correct, as well as the name of the library that the linker will include. 
+	- Build the python library:
+		* python3 setup.py build_ext --inplace
+		* // This may yield some warnings, check them. 
+	- Copy the library into one of the include paths of python, to check (within python)
+		* import sys
+		* sys.path()
+	- Include the library and check the functions in python.
+		 
