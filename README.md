@@ -9,7 +9,7 @@ You can get along with the python functions. As this project goes on, I want to 
   <p><b>open pyCext.c and modify the path to your Python.h header</b></p>
   <p>gcc -c NN_func.c -o NN_func.o </p>
   <p>ar rcs libstaticneural.a NN_func.o </p>
-  <p>gcc test.c -L. -lstaticneural -otest.o <font color="red"><em> <--- check no errors </em></font></p>
+  <p>gcc test.c -L. -lstaticneural -otest.o <em style="color:red"> <--- check no errors </em></p>
   <p>./test.o <font color="red"></em> <--- check no errors </em></font></p>
   <p>python3 setup.py build_ext --inplace </p>
   <p><b>copy the .so file in one of the python paths </b></p>
